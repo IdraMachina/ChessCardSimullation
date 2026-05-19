@@ -3,7 +3,7 @@ DocumentTemplate_CodexReportFormat.txt
 更新日時：報告更新日時を YYYY-MM-DD HH:MM:SS (Asia/Tokyo) 形式で記載する
 
 Codex側の作業完了時にユーザーへ回答する際は、以下のフォーマットに沿って回答すること。
-記述ルールは CodexWorkDocs/Development_Docs/CodexWorkGuide_CodexReportRules.txt を正とする。
+記述ルールは UnityProject を作業ディレクトリとした相対パスで ../CodexWorkDocs/Development_Docs/CodexWorkGuide_CodexReportRules.txt を正とする。
 通常の質問回答・相談・方針確認では、このフォーマットを使わず簡潔に回答すること。
 該当しない条件付き項目は省略し、確認できていない項目は「未確認」と明記すること。
 
@@ -13,11 +13,11 @@ Codex側の作業完了時にユーザーへ回答する際は、以下のフォ
 - 何をしたかを日本語で1行で記載する
 
 【仕様の正の場所】
-- CodexWorkDocs/Development_Docs（_DEPRECATED参照禁止。最新はファイル名そのままのもの）
+- ../CodexWorkDocs/Development_Docs（_DEPRECATED参照禁止。最新はファイル名そのままのもの）
 
 【参照ドキュメント一覧】
 - 仕様Docs：
-  - CodexWorkDocs/Development_Docs/参照した仕様書ファイル名
+  - ../CodexWorkDocs/Development_Docs/参照した仕様書ファイル名
 - 補助資料（必要時）：
   - 参照した補助資料のリポジトリルート相対パス
 
