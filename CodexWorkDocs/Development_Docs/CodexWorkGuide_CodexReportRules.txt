@@ -1,0 +1,37 @@
+CodexWorkGuide_CodexReportRules.txt
+（ChessCardSimullation_Unity / UnityProject：Codex完了報告の記述ルール / 回答フォーマット運用）
+作成日時：2026-04-14 16:52:39 (Asia/Tokyo)
+更新日時：2026-05-18 03:06:08 (Asia/Tokyo)
+
+目的：
+- Codexの作業完了報告で守る記述ルールを定義する。
+- 実際の回答フォーマットは CodexWorkDocs/Format_Template/DocumentTemplate_CodexReportFormat.txt を正とする。
+- 通常の質問回答・相談・方針確認では、完了報告フォーマットを使わず簡潔に回答する。
+- 条件付き項目は、採用プロジェクトまたは該当作業の場合のみ扱う。
+
+
+============================================================
+記述ルール
+============================================================
+
+- 見出し構造は CodexWorkDocs/Format_Template/DocumentTemplate_CodexReportFormat.txt を正とする。
+- 差し替えるのは主にパス、補助資料運用、確認項目とし、共通見出しは増やしすぎない。
+- 仕様の正の場所は、原則として CodexWorkDocs/Development_Docs を中心に記載する。
+- _DEPRECATED と明示されたDocsは、最新仕様の正として参照しない。
+- 変更ファイル一覧は、リポジトリルート起点の相対パスで統一的に出力する。
+- Unityプロジェクト配下のコード、Prefab、Scene、ScriptableObject、設定ファイルは UnityProject/Assets/...、UnityProject/Packages/...、UnityProject/ProjectSettings/... のように記載する。
+- 正式機能名辞書運用または開発状況ドキュメント運用を採用しないプロジェクトでは、関連する確認欄を省略または簡略化してよい。
+- 参照補助資料は、仕様の代替ではなく補助資料として扱う。
+- 未置換プレースホルダや判断不能な項目がある場合は、そのまま使用せず、未確定事項として明示する。
+- TODOは、今回新規追加または内容変更したものだけを列挙する。
+- Docs間の矛盾を見つけた場合は、作業を止め、矛盾箇所をファイル名・該当セクション見出し・矛盾内容で報告する。
+
+============================================================
+Codexへの運用指示
+============================================================
+
+- 作業完了報告時のみ、CodexWorkDocs/Format_Template/DocumentTemplate_CodexReportFormat.txt の形式に従う。
+- 通常の質問回答、相談、仕様確認、短い状況報告では、完了報告フォーマットを使わず簡潔に回答する。
+- DocumentTemplate_CodexReportFormat.txt へルール本文を重複記載しすぎない。
+- 該当しない条件付き項目は「該当なし」と長く書かず、原則として省略する。
+- 確認できていない項目は「未確認」と明記し、確認済みであるかのように書かない。
