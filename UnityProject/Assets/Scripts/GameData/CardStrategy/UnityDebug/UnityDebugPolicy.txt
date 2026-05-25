@@ -1,0 +1,84 @@
+CardStrategy UnityDebug 責務ポリシー
+
+1. 目的
+- UnityDebug 側コードの責務は、Runtime の状態表示、入力受付、検証用操作、簡易 GUI 更新に限定する。
+- MonoBehaviour を使うコードは、UnityDebug または UnityView 配下に置く。
+- Runtime に Unity 依存や UnityDebug 側の都合が逆流しない構造を維持する。
+- UnityDebug は Runtime を検証するための仮 UI であり、正式 UI ではない。
+
+2. UnityDebug 側が担当するもの
+- Runtime の状態を Unity 画面へ表示する。
+- Unity のクリック、ボタン、キー入力などを受け取る。
+- 開発中の検証用操作を Presenter へ渡す。
+- 盤面、手札、HP、マナ、ログなどの簡易 GUI を更新する。
+- 検証用の初期盤面、初期手札、テストカード、簡易シナリオを選択または読み込む。
+- UnityEngine、UnityEngine.UI、TextMeshPro を使用する表示・操作コードを保持する。
+
+3. UnityDebug 側が担当しないもの
+- Runtime のゲーム仕様そのものを決定すること。
+- 移動可能マス判定、交戦可能判定、攻城可能判定、ダメージ計算などを UnityDebug 側で再計算すること。
+- Runtime 内部の List や Dictionary を View から直接書き換えること。
+- BattleRuntime などの内部状態を Unity 側から直接改変すること。
+- UI の正式な見た目、配置、ハイライト色、演出をこの段階で確定すること。
+- 正式 UI としての画面設計や Prefab / Scene 実装。
+
+4. Presenter の役割
+- Runtime API を呼び出し、Runtime の状態変更を依頼する。
+- Runtime API の戻り値やログを受け取り、View に表示用データとして渡す。
+- Input から受け取った操作を Runtime API 呼び出しへ変換する。
+- View が Runtime 内部状態を直接書き換えないように、操作経路を集約する。
+- 例：移動操作を受け取った場合、Presenter が Runtime の移動 API を呼び、結果だけを View へ反映する。
+
+5. View の役割
+- 盤面、手札、HP、マナ、ログなどを表示する。
+- Runtime の状態を表示用に受け取り、Unity の GameObject、Button、Image、TextMeshProUGUI などへ反映する。
+- View は Runtime の公開メソッドを直接呼び続けるのではなく、原則として Presenter から渡された表示用データを描画する。
+- View は BattleRuntime、BoardState、CardZoneState などの内部コレクションを直接変更しない。
+
+6. Input の役割
+- クリック、ボタン、キー入力、検証用コマンド入力を受け取る。
+- 受け取った入力を Presenter へ渡す。
+- Input は移動可能マス判定や交戦可能判定を自前で確定しない。
+- 入力が有効かどうかは、Runtime API または Presenter が Runtime API 結果に基づいて判断する。
+
+7. Scenario の役割
+- 検証用の初期盤面、初期手札、テストカード、手順を読み込む。
+- 後続タスクで Runtime API に渡す検証用データを組み立てる。
+- Scenario は検証を始めるための入力データを用意する責務に留め、Runtime の仕様を上書きしない。
+- Scenario は正式なステージデータ仕様や報酬仕様をこの段階で確定しない。
+
+8. Runtime 操作の基本方針
+- UnityDebug から Runtime を操作する場合は、Runtime の公開メソッドを通す。
+- Runtime の状態変更は Presenter 経由で行う。
+- View や Input が Runtime の内部状態を直接改変する構造にしない。
+- UnityDebug 側は Runtime API の結果を表示する。
+- Runtime API が提供していない判定は、UnityDebug 側で恒久仕様として実装しない。必要な場合は TODO または確認事項として残す。
+
+9. Runtime API 結果表示の例
+- 移動可能マスの表示は、UnityDebug 側で再計算せず、Runtime 側の API 結果を表示する。
+- 交戦可能判定の表示は、UnityDebug 側で再計算せず、Runtime 側の API 結果を表示する。
+- 攻城可能判定の表示は、UnityDebug 側で再計算せず、Runtime 側の API 結果を表示する。
+- ダメージ予測やログ表示は、Runtime 側の DamageService や BattleLog などの結果を表示する。
+
+10. 将来 UnityDebug 側に作る予定のもの
+- UnityDebug/Presenter/BattleDebugPresenter.cs
+- UnityDebug/View/BoardDebugView.cs
+- UnityDebug/View/HandDebugView.cs
+- UnityDebug/View/FactionStatusDebugView.cs
+- UnityDebug/View/BattleLogDebugView.cs
+- UnityDebug/Input/DebugInputController.cs
+- UnityDebug/Scenario/TestScenarioSelector.cs
+
+11. このタスクで実装しないもの
+- BattleDebugPresenter の本実装。
+- BoardDebugView、HandDebugView、FactionStatusDebugView、BattleLogDebugView の本実装。
+- DebugInputController、TestScenarioSelector の本実装。
+- 盤面 GUI、カード GUI、マナ表示、HP 表示、ログ表示の具体実装。
+- UI の見た目、配置、ハイライト色、演出。
+- Prefab、Scene、正式 UI。
+
+12. 確認ルール
+- UnityDebugCompileCheck は、UnityDebug アセンブリから RuntimeCompileCheck を参照できることを確認する最小 MonoBehaviour として扱う。
+- UnityDebug asmdef は Runtime asmdef を参照してよい。
+- Runtime asmdef から UnityDebug asmdef を参照してはいけない。
+- タスク01時点では GUI テストを行わず、Unity 上でコンパイルが通ることと、UnityDebug 側から Runtime 側を参照できることを確認対象にする。
