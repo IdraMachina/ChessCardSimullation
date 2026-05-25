@@ -1,0 +1,107 @@
+CardStrategy Runtime 依存境界ポリシー
+
+1. 目的
+- 盤面、ターン、カード、戦闘、攻城、ダメージ計算などの中核処理は、UnityEngine に依存しない純 C# として実装する。
+- Runtime 中核ロジックを Unity 表示・入力・検証コードから分離し、自動テストしやすい構造を維持する。
+- 後続タスクで Runtime に Unity 依存を混入させないため、この文書を Codex 向け作業ルールとして扱う。
+
+2. Runtime 中核に置くもの
+- 盤面状態、盤面座標、マス状態。
+- カード定義、カードインスタンス、カード領域。
+- バトル進行、ターン進行、陣営状態、ユニット状態。
+- 移動、交戦、攻城、ダメージ計算。
+- アビリティ、計略、戦術、遺物、状態異常、地形効果などの効果処理入口。
+- BattleLog などの検証用ログ構造。
+- Runtime 内で完結する共通定数、enum、ID 型、結果型。
+
+3. UnityDebug / UnityView に置くもの
+- MonoBehaviour を継承するクラス。
+- Runtime 状態を画面へ表示する Presenter / View。
+- Unity の入力、クリック判定、デバッグ操作。
+- Prefab、Scene、Button、Image、TextMeshProUGUI などに触れる表示・操作コード。
+- Debug.Log など、Unity Console へ直接出力する検証コード。
+- 将来的な本番表示や正式 UI 候補は UnityView に置く。
+- 開発中の簡易 GUI、盤面、手札、マナ、本陣 HP、ログ確認用コードは UnityDebug に置く。
+
+4. Runtime 側で禁止する Unity 依存
+- using UnityEngine;
+- MonoBehaviour
+- ScriptableObject
+- GameObject
+- Transform
+- Vector2
+- Vector3
+- Color
+- Debug.Log
+- Button
+- Image
+- TextMeshProUGUI
+- Prefab 参照
+- Scene 参照
+- Runtime からの UI 更新呼び出し
+- Runtime から UnityDebug、UnityView、Presenter、View への参照
+
+5. Runtime 側で使用してよい代表的な型
+- int
+- bool
+- string
+- enum
+- List<T>
+- Dictionary<TKey, TValue>
+- IReadOnlyList<T>
+- IReadOnlyDictionary<TKey, TValue>
+- struct
+- class
+
+6. 座標表現の方針
+- Runtime の盤面座標は Unity の Vector2Int、Vector2、Vector3 に依存させない。
+- 盤面座標は BoardPosition のような Runtime 独自型で扱う。
+- Unity 上の表示座標への変換は、UnityDebug または UnityView 側の Presenter / View で行う。
+
+7. ログ出力の方針
+- Runtime は Debug.Log へ直接出力しない。
+- Runtime の処理結果や検証用情報は、BattleLog や IBattleLogger のような純 C# のログ構造へ記録する。
+- Unity Console へ出す必要がある場合は、UnityDebug 側で Runtime のログ構造を受け取り、Unity 側の責務として出力する。
+
+8. 参照方向の方針
+- UnityDebug 側と UnityView 側は Runtime 側を参照してよい。
+- Runtime 側から UnityDebug 側、UnityView 側、Presenter、View を参照してはいけない。
+- Runtime の状態変更は、UnityDebug / UnityView 側の Presenter から Runtime API を呼ぶ形に寄せる。
+- View 側が BattleRuntime などの内部状態を直接書き換える構造は避ける。
+
+9. DamageReductionValue / 被ダメージ軽減値の方針
+- v0.3 仕様では、Defense ステータスはカード基礎ステータスから削除されている。
+- Runtime では Defense をユニット基礎ステータスとして実装しない。
+- ダメージ軽減は DamageReductionValue / 被ダメージ軽減値という内部処理値として扱う。
+- 全ユニットおよび TargetHome の基本被ダメージ軽減値は 0 とする。
+- 被ダメージ軽減値は、アビリティ、戦術カード、計略カード、遺物カード、状態異常、地形効果、ステージ効果、リーダー能力などによって一時的または条件付きで発生するものとして扱う。
+
+10. 後続タスクで作る主要クラスの予定配置
+- Runtime/Board/BoardState.cs
+- Runtime/Board/BoardPosition.cs
+- Runtime/Board/BoardCell.cs
+- Runtime/Cards/CardDefinition.cs
+- Runtime/Cards/CardInstance.cs
+- Runtime/Cards/CardZoneState.cs
+- Runtime/Battle/BattleRuntime.cs
+- Runtime/Battle/BattleFactionState.cs
+- Runtime/Battle/UnitRuntime.cs
+- Runtime/Battle/DamageService.cs
+- Runtime/Battle/MovementService.cs
+- Runtime/Battle/CombatService.cs
+- Runtime/Battle/SiegeService.cs
+- Runtime/Logging/BattleLog.cs
+
+11. このタスクで実装しないもの
+- BoardState、BoardPosition、BoardCell の本実装。
+- CardDefinition、CardInstance、CardZoneState の本実装。
+- BattleRuntime、BattleFactionState、UnitRuntime の本実装。
+- DamageService、MovementService、CombatService、SiegeService の本実装。
+- BattleLog の本実装。
+- 仕様が未定義の挙動を、Codex の判断だけで恒久仕様として確定すること。
+
+12. 確認ルール
+- Runtime の C# ファイルに using UnityEngine; が入っていないことを確認する。
+- Runtime の C# ファイルに MonoBehaviour、ScriptableObject、GameObject、Transform、Vector2、Vector3、Color、Debug.Log、Button、Image、TextMeshProUGUI が入っていないことを確認する。
+- Runtime asmdef は UnityEngine 参照なしで扱う。
+- UnityDebug asmdef は Runtime asmdef を参照してよいが、Runtime asmdef から UnityDebug asmdef を参照しない。
