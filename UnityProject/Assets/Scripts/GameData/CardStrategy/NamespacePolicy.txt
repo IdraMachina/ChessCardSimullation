@@ -1,0 +1,36 @@
+CardStrategy 名前空間運用方針
+
+1. 基本名前空間
+- カード型戦略シミュレーションゲーム関連コードの基本名前空間は GameData.CardStrategy とする。
+
+2. Runtime 側
+- Runtime 中核ロジックは Assets/Scripts/GameData/CardStrategy/Runtime 配下に配置する。
+- Runtime アセンブリ名は GameData.CardStrategy.Runtime とする。
+- Runtime asmdef の Root Namespace は GameData.CardStrategy とする。
+- Runtime 側では UnityEngine、MonoBehaviour、ScriptableObject、GameObject、Transform、Button、TextMeshProUGUI などの Unity 依存型を使用しない。
+- Runtime 側から UnityDebug 側または UnityView 側を参照しない。
+- Runtime 中核のサブ名前空間は、必要に応じて以下の形にする。
+  - GameData.CardStrategy.Core
+  - GameData.CardStrategy.Board
+  - GameData.CardStrategy.Cards
+  - GameData.CardStrategy.Battle
+  - GameData.CardStrategy.Effects
+  - GameData.CardStrategy.Logging
+
+3. UnityDebug 側
+- UnityDebug のアセンブリ名は GameData.CardStrategy.UnityDebug とする。
+- UnityDebug asmdef の Root Namespace は GameData.CardStrategy.UnityDebug とする。
+- UnityDebug 側の名前空間は GameData.CardStrategy.UnityDebug 配下にする。
+- UnityDebug 側では UnityEngine、UnityEngine.UI、TextMeshPro を使用してよい。
+- UnityDebug 側は Runtime 側を参照してよい。
+- Runtime の状態変更は Presenter 経由で Runtime API を呼ぶ形に寄せる。
+- View 側が BattleRuntime などの内部状態を直接書き換える構造は避ける。
+
+4. UnityView 側
+- UnityView は将来的な本番表示や正式UI候補を置く場所として扱う。
+- UnityView の詳細なアセンブリ分割は、正式UI実装タスクで必要になった時点で決める。
+
+5. 今回作成するスタブの扱い
+- RuntimeCompileCheck は Runtime アセンブリのコンパイル確認用スタブであり、ゲームロジック本実装ではない。
+- UnityDebugCompileCheck は UnityDebug アセンブリから Runtime アセンブリを参照できることを確認する最小スタブであり、表示機能本実装ではない。
+- BoardState、BattleRuntime、DamageService、CardZoneState などの本実装または空クラスは、このタスクでは作成しない。
